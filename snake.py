@@ -54,7 +54,7 @@ class Food():
                                          fill=FOODCOLOR, tag="food")
 
 
-def turn(keypress):
+def keybinds(keypress):
     global direction
     if keypress.keycode == 37 and direction != "right":
         direction = "left"
@@ -65,6 +65,7 @@ def turn(keypress):
     if keypress.keycode == 40 and direction != "up":
         direction = "down"   
     if keypress.keycode == 32:
+        canvas.delete(instructions)
         while True:
             try: 
                 next_move(snake, food)
@@ -116,6 +117,20 @@ def set_score(username, score):
     scoreboard.write(f'{USERNAME}: {score} \n')
     scoreboard.close()
     
+def get_highscore():
+    scoreboard = open("snake_score.txt", "r")
+    lines = scoreboard.readlines()
+    highscore = 0
+    scoreholder = "Nobody"
+    for line in lines:
+        name, score = line.split(": ")
+        score = int(score)
+        if score > highscore:
+            highscore = score
+            scoreholder = name
+    return scoreholder, highscore
+    
+
 
 # Dictionary of directions   
 directions = {'up':[0,-GRID], 'down':[0,GRID], 'left':[-GRID,0], 'right':[GRID,0]}
@@ -125,8 +140,13 @@ direction = 'right' #Starting direction
 screen = tk.Tk()
 canvas = tk.Canvas(screen, bg=BACKGROUND, width=SCREENWIDTH, height=SCREENHIGHT)
 canvas.pack()
+
 snake = Snake()
 food = Food()
-screen.bind("<Key>", turn)
-
+screen.bind("<Key>", keybinds)
+instructions = canvas.create_text(SCREENWIDTH/2, SCREENHIGHT/2+GRID, 
+                   text = "Press <space> to start", fill = "#FFFFFF")
 screen.mainloop()
+
+winner, highscore = get_highscore()
+print(f'The best player is {winner} with {highscore} points!')
